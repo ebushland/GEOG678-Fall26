@@ -1,0 +1,59 @@
+/* Whole page: font, body text color, background */
+body {
+  font-family: Georgia, serif;
+  color: #333333;
+  /* font color 1: dark gray body text */
+  background-color: #f4f4f1;
+}
+
+/* Header block is centered */
+.header {
+  text-align: center;
+}
+
+.tagline {
+  font-style: italic;
+}
+
+/* Headings */
+h1 {
+  font-size: 36px;
+  color: #1f3a5f;
+  /* font color 2: navy */
+}
+
+h2 {
+  font-size: 22px;
+  color: #1f3a5f;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+/* Gray line under each job title */
+.meta {
+  color: #666666;
+  font-size: 14px;
+}
+
+/* Links */
+a {
+  color: #8a1c2b;
+  /* font color 3: maroon */
+}
+
+a:hover {
+  color: #1f3a5f;
+  /* turns navy when the mouse is over it */
+}
+
+.aside {
+  font-style: italic;
+}
+
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: #666666;
+}
