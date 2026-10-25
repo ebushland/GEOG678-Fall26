@@ -4,6 +4,7 @@
 - [Stylesheet (CSS)](style.css)
 - [Images](images)
 - [Resume Screenshot](ResumeScreenshot.png)
+- [Resume Browser Screenshot](ResumeBrowserScreenshot.png)
 - [Elements and Structure Screenshot](ElementsAndStructuresScreenshot.png)
 - [Tables Screenshot](TablesScreenshot.png)
 - [Syntax and Selectors Screenshot](SyntaxAndSelectorsScreenshot.png)
