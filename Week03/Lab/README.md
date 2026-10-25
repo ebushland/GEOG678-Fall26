@@ -3,6 +3,7 @@
 - [Resume (HTML)](index.html)
 - [Stylesheet (CSS)](style.css)
 - [Images](images)
+- [Resume Screenshot](ResumeScreenshot.png)
 - [Elements and Structure Screenshot](ElementsAndStructuresScreenshot.png)
 - [Tables Screenshot](TablesScreenshot.png)
 - [Syntax and Selectors Screenshot](SyntaxAndSelectorsScreenshot.png)
