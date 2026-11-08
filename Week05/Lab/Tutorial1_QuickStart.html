@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tutorial 1 - Leaflet Quickstart</title>
+  <meta charset="utf-8">
+
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+
+</head>
+
+<body>
+  <!-- Map container -->
+  <div id="map" style="height: 400px"></div>
+
+  <script>
+    // Build the map, centered on London at zoom 13.
+    var map = L.map('map').setView([51.505, -0.09], 13);
+
+    // The basemap or tile layer. 
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // A point
+    var marker = L.marker([51.5, -0.09]).addTo(map);
+
+    // A circle: radius in meters
+    var circle = L.circle([51.508, -0.11], {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 500
+    }).addTo(map);
+
+    // A polygon: a list of vertices. Leaflet closes it automatically so I don't have to repeat the first vertex at the end.
+    var polygon = L.polygon([
+      [51.509, -0.08],
+      [51.503, -0.06],
+      [51.51, -0.047]
+    ]).addTo(map);
+
+    // Attach popups features. 
+    marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+    circle.bindPopup("I am a circle.");
+    polygon.bindPopup("I am a polygon.");
+
+    // A popup that isn't attached to a feature. 
+    var standalonePopup = L.popup()
+      .setLatLng([51.513, -0.09])
+      .setContent("I am a standalone popup.")
+      .openOn(map);
+
+    // One reusable popup for map clicks. The tutorial reuses the name "popup" for this;
+    // I renamed it so the two popups don't get confused
+    var clickPopup = L.popup();
+
+    // Leaflet passes an event object "e" where you clicked
+    function onMapClick(e) {
+      clickPopup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+    }
+
+    // Run onMapClick for every click. 
+    map.on('click', onMapClick);
+  </script>
+</body>
+
+</html>

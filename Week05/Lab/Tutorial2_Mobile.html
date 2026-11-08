@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tutorial 2 - Leaflet on Mobile</title>
+    <meta charset="utf-8">
+
+    <!-- Makes phones show the page at actual size -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        /* Makes the map element stretch to all available space (fullscreen) */
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100vw;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script>
+        // Start zoomed out to the whole world.
+        var map = L.map('map').fitWorld();
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Runs when user agrees to share location and is detected by browser.
+        function onLocationFound(e) {
+            var radius = e.accuracy;
+
+            // Marker at your location with a popup giving the accuracy
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+            // Circle showing the accuracy range
+            L.circle(e.latlng, radius).addTo(map);
+        }
+
+        // Runs if you deny permission or the browser can't find you
+        function onLocationError(e) {
+            alert(e.message);
+        }
+
+        // Set up the listeners before asking for location, so neither result is missed
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+
+        // Ask the browser for your location.maxZoom: 16 keeps it from zooming in too far
+        map.locate({ setView: true, maxZoom: 16 });
+    </script>
+</body>
+
+</html>
