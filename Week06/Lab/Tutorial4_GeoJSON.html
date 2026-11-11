@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tutorial 4 - Using GeoJSON with Leaflet</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        #map {
+            width: 800px;
+            height: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <!--Didn't see this in the tutorial, but when things weren't looking correct, AI helped me
+        identify the issue. The external data file must sit in the same folder as this page
+         and load BEFORE the script below, because that script uses its
+         variables (freeBus, bicycleRental, campus, coorsField). -->
+
+    <script src="sample-geojson.js"></script>
+
+    <script>
+
+        // Map centered on downtown Denver
+
+        const map = L.map('map').setView([39.74739, -105], 13);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+        // Custom icon for Coors Field
+
+        const baseballIcon = L.icon(
+            {
+                iconUrl: 'baseball-marker.png',
+                iconSize: [32, 37],     // width, height of the image in pixels
+                iconAnchor: [16, 37],   // pixel that sits on the coordinate (bottom center)
+                popupAnchor: [0, -28]   // where the popup opens, relative to the anchor
+            });
+
+        // Popup function shared by every layer.
+
+        function onEachFeature(feature, layer) {
+            let popupContent = `<p>I started out as a GeoJSON ${feature.geometry.type}, but now I'm a Leaflet vector!</p>`;
+
+            if (feature.properties && feature.properties.popupContent) {
+                popupContent += feature.properties.popupContent;
+            }
+
+            layer.bindPopup(popupContent);
+        }
+
+        // Bike rentals (points) and campus (polygons) in one layer.
+
+        const bicycleRentalLayer = L.geoJSON([bicycleRental, campus],
+            {
+                style: function (feature) {
+                    return feature.properties && feature.properties.style;
+                },
+
+                onEachFeature: onEachFeature,
+
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 8,
+                        fillColor: '#ff7800',
+                        color: '#000',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    });
+                }
+            }).addTo(map);
+
+        // Free bus route, with a filter.
+
+        const freeBusLayer = L.geoJSON(freeBus,
+            {
+                filter: function (feature, layer) {
+                    if (feature.properties) {
+                        // If the property exists, show only segments NOT under construction
+                        return feature.properties.underConstruction !== undefined
+                            ? !feature.properties.underConstruction
+                            : true;
+                    }
+                    return false;
+                },
+
+                onEachFeature: onEachFeature
+            }).addTo(map);
+
+        // Coors Field with the custom baseball icon
+
+        const coorsLayer = L.geoJSON(coorsField,
+            {
+                pointToLayer: function (feature, latlng) {
+                    return L.marker(latlng, { icon: baseballIcon });
+                },
+
+                onEachFeature: onEachFeature
+            }).addTo(map);
+    </script>
+</body>
+
+</html>
