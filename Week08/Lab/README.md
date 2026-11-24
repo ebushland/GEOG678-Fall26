@@ -1,6 +1,6 @@
 # Week 8 Lab: Interactive Charts (ArcGIS Dashboards, D3, Highcharts)
 
-**Dashboard:** [Real-time Earthquake Map] (https://arcg.is/0uvT892)
+**Dashboard:** [Real-time Earthquake Map](https://arcg.is/0uvT892)
 
 This lab covers three ways to build interactive charts: an ArcGIS Dashboard driven by a live data feed, and the same weekly temperature forecast drawn twice, once with D3 and once with Highcharts.
 
