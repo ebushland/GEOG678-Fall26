@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<!-- Chart built with D3 v7: scales, axes, line generators, and data joins -->
+
+<head>
+    <title>Lab8 D3 Weather Erik Bushland</title>
+    <!-- v7 this time, to match current examples -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 2.5;
+        }
+
+        .high {
+            stroke: #d6452e;
+        }
+
+        .low {
+            stroke: #2e7bd6;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="chart"></div>
+    <script>
+        var forecast = [
+            { day: "Sat", high: 82, low: 67 },
+            { day: "Sun", high: 81, low: 59 },
+            { day: "Mon", high: 81, low: 50 },
+            { day: "Tue", high: 70, low: 47 },
+            { day: "Wed", high: 77, low: 51 },
+            { day: "Thu", high: 78, low: 60 },
+            { day: "Fri", high: 79, low: 66 },
+            { day: "Sat", high: 80, low: 66 }
+        ];
+
+        var margin = { top: 50, right: 60, bottom: 40, left: 50 };
+        var width = 700 - margin.left - margin.right;   // space for the plot itself
+        var height = 400 - margin.top - margin.bottom;
+
+        var svg = d3.select("#chart")
+            .append("svg")                                 // the full 700 x 400 canvas
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")                                   // a group shifted inside the margins
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // X: one evenly spaced slot per day, keyed by position 0 to 7
+        var x = d3.scalePoint()
+            .domain(d3.range(forecast.length))   // [0, 1, 2, 3, 4, 5, 6, 7]
+            .range([0, width])
+            .padding(0.5);                        // a little space at each end
+
+        // Y: temperature to vertical pixels
+        var y = d3.scaleLinear()
+            .domain([40, 90])                     // temperature range shown
+            .range([height, 0]);                  // flipped: SVG y counts DOWN from the top
+
+        // Bottom axis: show the day name for each position
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")   // move to the bottom
+            .call(d3.axisBottom(x).tickFormat(function (i) { return forecast[i].day; }));
+
+        // Left axis: add the degree symbol
+        svg.append("g")
+            .call(d3.axisLeft(y).tickFormat(function (d) { return d + "°F"; }));
+
+        // 1. Define the gradient (invisible until something uses it)
+        var defs = svg.append("defs");
+
+        var gradient = defs.append("linearGradient")
+            .attr("id", "temp-gradient")
+            .attr("gradientUnits", "userSpaceOnUse")  // coordinates = chart pixels
+            .attr("x1", 0).attr("y1", y(40))          // start at 40° (bottom)
+            .attr("x2", 0).attr("y2", y(90));         // end at 90° (top) = vertical ramp
+
+        // 2. Add color stops: 11 of them, from 0 (bottom) to 1 (top)
+        gradient.selectAll("stop")
+            .data(d3.range(0, 1.01, 0.1))             // [0, 0.1, 0.2, ... 1]
+            .enter()
+            .append("stop")
+            .attr("offset", function (t) { return t; })
+            .attr("stop-color", function (t) { return d3.interpolateRdYlBu(1 - t); });
+
+        // 3. The area shape between low and high
+        var band = d3.area()
+            .x(function (d, i) { return x(i); })
+            .y0(function (d) { return y(d.low); })    // bottom edge = low temp
+            .y1(function (d) { return y(d.high); });  // top edge = high temp
+
+        // 4. Draw it, filled with the gradient
+        svg.append("path")
+            .datum(forecast)
+            .attr("fill", "url(#temp-gradient)")
+            .attr("opacity", 0.6)                     // keeps labels readable
+            .attr("d", band);
+
+        // A line generator turns an array of points into an SVG path string
+        var highLine = d3.line()
+            .x(function (d, i) { return x(i); })        // i = position in the array
+            .y(function (d) { return y(d.high); });
+
+        var lowLine = d3.line()
+            .x(function (d, i) { return x(i); })
+            .y(function (d) { return y(d.low); });
+
+        svg.append("path")
+            .datum(forecast)                  // the WHOLE array becomes one path
+            .attr("class", "line high")
+            .attr("d", highLine);
+
+        svg.append("path")
+            .datum(forecast)
+            .attr("class", "line low")
+            .attr("d", lowLine);
+
+        // High dots
+        svg.selectAll(".high-dot")
+            .data(forecast)
+            .enter()
+            .append("circle")
+            .attr("class", "high-dot")
+            .attr("cx", function (d, i) { return x(i); })
+            .attr("cy", function (d) { return y(d.high); })
+            .attr("r", 4)
+            .attr("fill", "#d6452e");
+
+        // Low dots
+        svg.selectAll(".low-dot")
+            .data(forecast)
+            .enter()
+            .append("circle")
+            .attr("class", "low-dot")
+            .attr("cx", function (d, i) { return x(i); })
+            .attr("cy", function (d) { return y(d.low); })
+            .attr("r", 4)
+            .attr("fill", "#2e7bd6");
+
+        // High values, placed above each dot
+        svg.selectAll(".high-label")
+            .data(forecast)
+            .enter()
+            .append("text")
+            .attr("class", "high-label")
+            .attr("x", function (d, i) { return x(i); })
+            .attr("y", function (d) { return y(d.high) - 10; })
+            .attr("text-anchor", "middle")
+            .attr("font-size", "11px")
+            .text(function (d) { return d.high; });
+
+        // Low values, placed below each dot
+        svg.selectAll(".low-label")
+            .data(forecast)
+            .enter()
+            .append("text")
+            .attr("class", "low-label")
+            .attr("x", function (d, i) { return x(i); })
+            .attr("y", function (d) { return y(d.low) + 18; })
+            .attr("text-anchor", "middle")
+            .attr("font-size", "11px")
+            .text(function (d) { return d.low; });
+
+        // Chart title, centered above the plot (negative y = in the top margin)
+        svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", -20)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "18px")
+            .attr("font-weight", "bold")
+            .text("College Station Weekly Temperature Forecast");
+
+        // Label each line at its right end (works as a legend)
+        var last = forecast.length - 1;
+
+        svg.append("text")
+            .attr("x", x(last) + 10)
+            .attr("y", y(forecast[last].high))
+            .attr("dy", "0.35em")             // vertically centers text on the point
+            .attr("fill", "#d6452e")
+            .text("High");
+
+        svg.append("text")
+            .attr("x", x(last) + 10)
+            .attr("y", y(forecast[last].low))
+            .attr("dy", "0.35em")
+            .attr("fill", "#2e7bd6")
+            .text("Low");
+
+    </script>
+</body>
+
+</html>

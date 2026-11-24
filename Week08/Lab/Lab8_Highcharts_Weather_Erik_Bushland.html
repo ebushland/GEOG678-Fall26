@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lab 8: Highcharts Weather - Erik Bushland</title>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+    <style>
+        #container {
+            min-width: 310px;
+            max-width: 800px;
+            height: 400px;
+            margin: 0 auto
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+
+    <script>Highcharts.chart('container', {
+            title: { text: 'College Station Weekly Temperature Forecast' },
+            subtitle: { text: 'Daily high and low (°F)' },
+
+            // Categories handle the repeated "Sat" fine (unlike D3)
+            xAxis: { categories: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] },
+
+            yAxis: { title: { text: 'Temperature (°F)' } },
+
+            tooltip: { shared: true, valueSuffix: '°F' },   // one tooltip shows both values
+
+            plotOptions: {
+                line: { dataLabels: { enabled: true } }     // print the value on each point
+            },
+
+            series: [{
+                name: 'High',
+                data: [82, 81, 81, 70, 77, 78, 79, 80],
+                color: '#d6452e'                            // same red as your D3 chart
+            }, {
+                name: 'Low',
+                data: [67, 59, 50, 47, 51, 60, 66, 66],
+                color: '#2e7bd6'                            // same blue
+            }]
+        });
+    </script>
+</body>
+
+</html>
